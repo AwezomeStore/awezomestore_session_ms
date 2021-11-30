@@ -6,6 +6,6 @@ import lombok.Data;
 public class CountryDTO{
     
     private String id;
-    private String country_name;
-    private String country_code;
+    private String countryName;
+    private String countryCode;
 }
