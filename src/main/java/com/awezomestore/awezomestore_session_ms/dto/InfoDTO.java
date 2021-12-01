@@ -6,10 +6,10 @@ import lombok.Data;
 public class InfoDTO{
     
     private String id;
-    private String user_id;
-    private String country_id;
-    private String currency_id;
-    private String language_id;
+    private String userId;
+    private String countryId;
+    private String currencyId;
+    private String languageId;
     private String email;
     private String phone;
 }
