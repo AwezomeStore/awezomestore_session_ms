@@ -6,7 +6,7 @@ import lombok.Data;
 public class CurrencyDTO{
     
     private String id;
-    private String currency_name;
-    private String currency_abbreviation;
-    private String currency_symbol;
+    private String currencyName;
+    private String currencyAbbreviation;
+    private String currencySymbol;
 }
