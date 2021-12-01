@@ -6,6 +6,6 @@ import lombok.Data;
 public class LanguageDTO{
     
     private String id;
-    private String language_name;
-    private String language_abbreviation;
+    private String languageName;
+    private String languageAbbreviation;
 }

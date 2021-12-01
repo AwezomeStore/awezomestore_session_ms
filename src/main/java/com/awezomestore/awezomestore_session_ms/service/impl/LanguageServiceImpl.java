@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
-import com.awezomestore.awezomestore_session_ms.dto.CurrencyDTO;
-import com.awezomestore.awezomestore_session_ms.service.CurrencyService;
+import com.awezomestore.awezomestore_session_ms.dto.LanguageDTO;
+import com.awezomestore.awezomestore_session_ms.service.LanguageService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
@@ -17,32 +17,31 @@ import com.google.firebase.cloud.FirestoreClient;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CurrencyServiceImpl implements CurrencyService {
+public class LanguageServiceImpl implements LanguageService {
 
     private CollectionReference getCollection(){
-        return FirestoreClient.getFirestore().collection("currencies");
+        return FirestoreClient.getFirestore().collection("languages");
     }
 
-    private Map<String, Object> getDocData(CurrencyDTO currency){
+    private Map<String, Object> getDocData(LanguageDTO language){
         Map<String, Object> docData = new HashMap<>();
-        docData.put("currencyName", currency.getCurrencyName());
-        docData.put("currencyAbbreviation", currency.getCurrencyAbbreviation());
-        docData.put("currencySymbol", currency.getCurrencySymbol());
+        docData.put("languageName", language.getLanguageName());
+        docData.put("languageAbbreviation", language.getLanguageAbbreviation());
         return docData;
     }
 
     @Override
-    public List<CurrencyDTO> getAll(){
-        List<CurrencyDTO> currencyList = new ArrayList<>();
-        CurrencyDTO currency;
+    public List<LanguageDTO> getAll(){
+        List<LanguageDTO> languageList = new ArrayList<>();
+        LanguageDTO language;
 
         try {
             for (DocumentSnapshot doc : getCollection().get().get().getDocuments()) {
-                currency = doc.toObject(CurrencyDTO.class);
-                currency.setId(doc.getId());
-                currencyList.add(currency);
+                language = doc.toObject(LanguageDTO.class);
+                language.setId(doc.getId());
+                languageList.add(language);
             }
-            return currencyList;
+            return languageList;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -50,10 +49,10 @@ public class CurrencyServiceImpl implements CurrencyService {
     };
 
     @Override
-    public Boolean create(CurrencyDTO currency){
-        Map<String, Object> docData = getDocData(currency);
-        CollectionReference currencies = getCollection();
-        ApiFuture<WriteResult> writeResultApiFurute = currencies.document().create(docData);
+    public Boolean create(LanguageDTO language){
+        Map<String, Object> docData = getDocData(language);
+        CollectionReference languages = getCollection();
+        ApiFuture<WriteResult> writeResultApiFurute = languages.document().create(docData);
 
         try {
             if(null != writeResultApiFurute.get()){
@@ -66,8 +65,8 @@ public class CurrencyServiceImpl implements CurrencyService {
     };
 
     @Override
-    public Boolean update(String id, CurrencyDTO currency){
-        Map<String, Object> docData = getDocData(currency);
+    public Boolean update(String id, LanguageDTO language){
+        Map<String, Object> docData = getDocData(language);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).set(docData);
         try {
             if(null != writeResultApiFuture.get()){

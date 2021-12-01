@@ -55,8 +55,8 @@ public class InfoServiceImpl implements InfoService {
     @Override
     public Boolean create(InfoDTO info){
         Map<String, Object> docData = getDocData(info);
-        CollectionReference countries = getCollection();
-        ApiFuture<WriteResult> writeResultApiFurute = countries.document().create(docData);
+        CollectionReference infos = getCollection();
+        ApiFuture<WriteResult> writeResultApiFurute = infos.document().create(docData);
 
         try {
             if(null != writeResultApiFurute.get()){
