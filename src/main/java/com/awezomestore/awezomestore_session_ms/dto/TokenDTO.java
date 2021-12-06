@@ -6,7 +6,7 @@ import lombok.Data;
 public class TokenDTO{
     
     private String id;
-    private String user_id;
+    private String userId;
     private String token;
     private Boolean valid;
 }
