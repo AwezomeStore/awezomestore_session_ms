@@ -10,6 +10,7 @@ import com.awezomestore.awezomestore_session_ms.dto.UserDTO;
 import com.awezomestore.awezomestore_session_ms.service.UserService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
@@ -19,11 +20,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserServiceImpl implements UserService {
 
-    private CollectionReference getCollection(){
+    private CollectionReference getCollection() {
         return FirestoreClient.getFirestore().collection("users");
     }
 
-    private Map<String, Object> getDocData(UserDTO user){
+    private Map<String, Object> getDocData(UserDTO user) {
         Map<String, Object> docData = new HashMap<>();
         docData.put("firstName", user.getFirstName());
         docData.put("lastName", user.getLastName());
@@ -31,7 +32,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getAll(){
+    public List<UserDTO> getAll() {
         List<UserDTO> userList = new ArrayList<>();
         UserDTO user;
 
@@ -49,27 +50,27 @@ public class UserServiceImpl implements UserService {
     };
 
     @Override
-    public Boolean create(UserDTO user){
-        Map<String, Object> docData = getDocData(user);
+    public String create(UserDTO user) {
         CollectionReference users = getCollection();
-        ApiFuture<WriteResult> writeResultApiFurute = users.document().create(docData);
-
+        ApiFuture<DocumentReference> addedDocRef = users.add(user);
         try {
-            if(null != writeResultApiFurute.get()){
-                return Boolean.TRUE;
-            }
-            return Boolean.FALSE;
-        } catch (Exception e) {
-            return Boolean.FALSE;
+            return addedDocRef.get().getId();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return null;
     };
 
     @Override
-    public Boolean update(String id, UserDTO user){
+    public Boolean update(String id, UserDTO user) {
         Map<String, Object> docData = getDocData(user);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).set(docData);
         try {
-            if(null != writeResultApiFuture.get()){
+            if (null != writeResultApiFuture.get()) {
                 return Boolean.TRUE;
             }
             return Boolean.FALSE;
@@ -80,17 +81,33 @@ public class UserServiceImpl implements UserService {
     };
 
     @Override
-    public Boolean delete(String id){
+    public Boolean delete(String id) {
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).delete();
         try {
-            if(null != writeResultApiFuture.get()){
+            if (null != writeResultApiFuture.get()) {
                 return Boolean.TRUE;
             }
             return Boolean.FALSE;
         } catch (Exception e) {
-            //TODO: handle exception
             e.printStackTrace();
             return Boolean.FALSE;
         }
+    }
+
+    @Override
+    public UserDTO getById(String id) {
+        try {
+            DocumentSnapshot doc = getCollection().document(id).get().get();
+            if (null != doc.getData()) {
+                UserDTO user = new UserDTO();
+                user.setId(id);
+                user.setFirstName((String) doc.getData().get("firstName"));
+                user.setLastName((String) doc.getData().get("lastName"));
+                return user;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
     };
 }

@@ -4,54 +4,44 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
-import com.awezomestore.awezomestore_session_ms.dto.AccessDTO;
 import com.awezomestore.awezomestore_session_ms.dto.RoleDTO;
-import com.awezomestore.awezomestore_session_ms.service.AccessService;
+import com.awezomestore.awezomestore_session_ms.enums.RoleName;
+import com.awezomestore.awezomestore_session_ms.service.RoleService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AccessServiceImpl implements AccessService {
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
+public class RoleServiceImpl implements RoleService {
 
     private CollectionReference getCollection(){
-        return FirestoreClient.getFirestore().collection("access");
+        return FirestoreClient.getFirestore().collection("roles");
     }
 
-    private Map<String, Object> getDocData(AccessDTO access){
+    private Map<String, Object> getDocData(RoleDTO role){
         Map<String, Object> docData = new HashMap<>();
-        docData.put("userId", access.getUserId());
-        docData.put("username", access.getUsername());
-        docData.put("password", access.getPassword());
-        docData.put("level", access.getLevel());
-        docData.put("roles", access.getRoles());
+        docData.put("RoleName", role.getRoleName());
         return docData;
     }
 
     @Override
-    public List<AccessDTO> getAll(){
-        List<AccessDTO> accessList = new ArrayList<>();
-        AccessDTO access;
+    public List<RoleDTO> getAll(){
+        List<RoleDTO> roleList = new ArrayList<>();
+        RoleDTO role;
 
         try {
             for (DocumentSnapshot doc : getCollection().get().get().getDocuments()) {
-                access = doc.toObject(AccessDTO.class);
-                access.setId(doc.getId());
-                accessList.add(access);
+                role = doc.toObject(RoleDTO.class);
+                role.setId(doc.getId());
+                roleList.add(role);
             }
-            return accessList;
+            return roleList;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -59,11 +49,10 @@ public class AccessServiceImpl implements AccessService {
     };
 
     @Override
-    public Boolean create(AccessDTO access){
-        access.setPassword(passwordEncoder.encode(access.getPassword()));
-        Map<String, Object> docData = getDocData(access);
-        CollectionReference _access = getCollection();
-        ApiFuture<WriteResult> writeResultApiFurute = _access.document().create(docData);
+    public Boolean create(RoleDTO role){
+        Map<String, Object> docData = getDocData(role);
+        CollectionReference _role = getCollection();
+        ApiFuture<WriteResult> writeResultApiFurute = _role.document().create(docData);
         try {
             if(null != writeResultApiFurute.get()){
                 return Boolean.TRUE;
@@ -75,8 +64,8 @@ public class AccessServiceImpl implements AccessService {
     };
 
     @Override
-    public Boolean update(String id, AccessDTO access){
-        Map<String, Object> docData = getDocData(access);
+    public Boolean update(String id, RoleDTO role){
+        Map<String, Object> docData = getDocData(role);
         ApiFuture<WriteResult> writeResultApiFuture = getCollection().document(id).set(docData);
         try {
             if(null != writeResultApiFuture.get()){
@@ -105,18 +94,14 @@ public class AccessServiceImpl implements AccessService {
     };
 
     @Override
-    public AccessDTO getById(String id) {
+    public RoleDTO getById(String id) {
         try {
             DocumentSnapshot doc = getCollection().document(id).get().get();
             if (null != doc.getData()) {
-                AccessDTO access = new AccessDTO();
-                access.setId(id);
-                access.setUserId((String) doc.getData().get("userId"));
-                access.setUsername((String) doc.getData().get("username"));
-                access.setPassword((String) doc.getData().get("password"));
-                access.setLevel((Long) doc.getData().get("level"));
-                access.setRoles((ArrayList<RoleDTO>) doc.getData().get("roles"));
-                return access;
+                RoleDTO role = new RoleDTO();
+                role.setId(id);
+                role.setRoleName((RoleName) doc.getData().get("RoleName"));
+                return role;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -125,15 +110,15 @@ public class AccessServiceImpl implements AccessService {
     };
 
     @Override
-    public AccessDTO getByUsername(String username){
-        AccessDTO access = new AccessDTO();
+    public RoleDTO getByRoleName(RoleName RoleName){
+        RoleDTO role = new RoleDTO();
         try {
             for (DocumentSnapshot doc : getCollection().get().get().getDocuments()) {
-                access = doc.toObject(AccessDTO.class);
-                if (access.getUsername() != null) {
-                    if (access.getUsername().equals(username)) {
-                        access.setId(doc.getId());
-                        return access;
+                role = doc.toObject(RoleDTO.class);
+                if (role.getRoleName() != null) {
+                    if (role.getRoleName() == RoleName) {
+                        role.setId(doc.getId());
+                        return role;
                     }
                 }
             }
@@ -141,5 +126,5 @@ public class AccessServiceImpl implements AccessService {
             e.printStackTrace();
         }
         return null;
-    };
+    }
 }

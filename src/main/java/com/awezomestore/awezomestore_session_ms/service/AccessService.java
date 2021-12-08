@@ -5,6 +5,10 @@ import java.util.List;
 import com.awezomestore.awezomestore_session_ms.dto.AccessDTO;
 
 public interface AccessService {
+
+    AccessDTO getById(String id);
+
+    AccessDTO getByUsername(String username);
     
     List<AccessDTO> getAll();
 

@@ -22,6 +22,11 @@ public class UserController {
     @Autowired
     private UserService service;
 
+    @GetMapping(value = "/{id}/get")
+    public ResponseEntity getById(@PathVariable(value = "id") String id){
+        return new ResponseEntity<>(service.getById(id), HttpStatus.OK);
+    }
+
     @GetMapping(value = "/getAll")
     public ResponseEntity getAll(){
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);

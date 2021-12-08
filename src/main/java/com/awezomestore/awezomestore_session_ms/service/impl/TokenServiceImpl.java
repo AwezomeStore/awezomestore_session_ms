@@ -10,6 +10,7 @@ import com.awezomestore.awezomestore_session_ms.dto.TokenDTO;
 import com.awezomestore.awezomestore_session_ms.service.TokenService;
 import com.google.api.core.ApiFuture;
 import com.google.cloud.firestore.CollectionReference;
+import com.google.cloud.firestore.DocumentReference;
 import com.google.cloud.firestore.DocumentSnapshot;
 import com.google.cloud.firestore.WriteResult;
 import com.google.firebase.cloud.FirestoreClient;
@@ -27,7 +28,7 @@ public class TokenServiceImpl implements TokenService {
         Map<String, Object> docData = new HashMap<>();
         docData.put("userId", token.getUserId());
         docData.put("token", token.getToken());
-        docData.put("valid", token.getValid());
+        docData.put("roles", token.getRoles());
         return docData;
     }
 
@@ -50,19 +51,19 @@ public class TokenServiceImpl implements TokenService {
     };
 
     @Override
-    public Boolean create(TokenDTO token){
-        Map<String, Object> docData = getDocData(token);
+    public String create(TokenDTO token){
         CollectionReference tokens = getCollection();
-        ApiFuture<WriteResult> writeResultApiFurute = tokens.document().create(docData);
-
+        ApiFuture<DocumentReference> addedDocRef = tokens.add(token);
         try {
-            if(null != writeResultApiFurute.get()){
-                return Boolean.TRUE;
-            }
-            return Boolean.FALSE;
-        } catch (Exception e) {
-            return Boolean.FALSE;
+            return addedDocRef.get().getId();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
+        return null;
     };
 
     @Override
