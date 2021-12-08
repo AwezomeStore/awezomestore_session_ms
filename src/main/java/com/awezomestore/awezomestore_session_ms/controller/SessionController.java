@@ -1,12 +1,6 @@
 package com.awezomestore.awezomestore_session_ms.controller;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import com.awezomestore.awezomestore_session_ms.dto.AccessDTO;
 import com.awezomestore.awezomestore_session_ms.dto.RoleDTO;
@@ -24,12 +18,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,19 +69,19 @@ public class SessionController {
         if (userId == null) {
             return new ResponseEntity<>("Cannot create the user in Firestore", HttpStatus.CONFLICT);
         }
-        ArrayList<RoleDTO> roles = new ArrayList<RoleDTO>();
+        ArrayList<RoleDTO> authorities = new ArrayList<RoleDTO>();
         if (signUpDTO.getRoles() != null) {
             if (signUpDTO.getRoles().contains("vendor")) {
-                roles.add(RoleService.getByRoleName(RoleName.ROLE_VENDOR));
+                authorities.add(RoleService.getByRoleName(RoleName.ROLE_VENDOR));
             }
             if (signUpDTO.getRoles().contains("buyer")) {
-                roles.add(RoleService.getByRoleName(RoleName.ROLE_BUYER));
+                authorities.add(RoleService.getByRoleName(RoleName.ROLE_BUYER));
             }
             if (signUpDTO.getRoles().contains("support")) {
-                roles.add(RoleService.getByRoleName(RoleName.ROLE_SUPPORT));
+                authorities.add(RoleService.getByRoleName(RoleName.ROLE_SUPPORT));
             }
         } else {
-            roles.add(RoleService.getByRoleName(RoleName.ROLE_BUYER));
+            authorities.add(RoleService.getByRoleName(RoleName.ROLE_BUYER));
         }
         Long level = (long) 1;
         AccessDTO access = new AccessDTO();
@@ -97,7 +89,7 @@ public class SessionController {
         access.setUsername(signUpDTO.getUsername());
         access.setPassword(signUpDTO.getPassword());
         access.setLevel(level);
-        access.setRoles(roles);
+        access.setAuthorities(authorities);
         return new ResponseEntity<>(accessService.create(access), HttpStatus.CREATED);
     }
 
@@ -114,6 +106,9 @@ public class SessionController {
             return new ResponseEntity<>(token, HttpStatus.CREATED);
         } catch (BadCredentialsException e) {
             TokenDTO token = new TokenDTO("Incorrect credentials");
+            return new ResponseEntity<>(token, HttpStatus.BAD_REQUEST);
+        } catch (InternalAuthenticationServiceException e) {
+            TokenDTO token = new TokenDTO("Username does not exists");
             return new ResponseEntity<>(token, HttpStatus.BAD_REQUEST);
         }
     }

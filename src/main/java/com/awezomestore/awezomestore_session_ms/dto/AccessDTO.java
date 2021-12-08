@@ -19,15 +19,15 @@ public class AccessDTO implements UserDetails {
     private String username;
     private String password;
     private Long level;
-    private ArrayList<RoleDTO> roles;
+    private ArrayList<RoleDTO> authorities;
 
     public AccessDTO(String userId, String username, String password, Long level,
-    ArrayList<RoleDTO> roles) {
+            ArrayList<RoleDTO> authorities) {
         this.userId = userId;
         this.username = username;
         this.password = password;
         this.level = level;
-        this.roles = roles;
+        this.authorities = authorities;
     }
 
     public AccessDTO() {
@@ -35,9 +35,22 @@ public class AccessDTO implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        List<GrantedAuthority> auths = this.roles.stream().map(rol -> new SimpleGrantedAuthority(rol
+        List<GrantedAuthority> auths = this.authorities.stream().map(rol -> new SimpleGrantedAuthority(rol
                 .getRoleName().name())).collect(Collectors.toList());
         return auths;
+    }
+
+    public void setAuthorities(
+            ArrayList<RoleDTO> authorities) {
+        this.authorities = authorities;
+    }
+
+    public void setRoles(ArrayList<RoleDTO> roles){
+        this.authorities = roles;
+    }
+
+    public ArrayList<RoleDTO> getRoles(){
+        return this.authorities;
     }
 
     @Override

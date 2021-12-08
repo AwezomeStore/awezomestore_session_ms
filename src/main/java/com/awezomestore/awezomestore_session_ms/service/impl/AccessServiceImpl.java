@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 
 import com.awezomestore.awezomestore_session_ms.dto.AccessDTO;
@@ -36,16 +35,15 @@ public class AccessServiceImpl implements AccessService {
         docData.put("username", access.getUsername());
         docData.put("password", access.getPassword());
         docData.put("level", access.getLevel());
-        docData.put("roles", access.getRoles());
+        docData.put("authorities", access.getRoles());
         return docData;
     }
 
     @Override
     public List<AccessDTO> getAll(){
-        List<AccessDTO> accessList = new ArrayList<>();
-        AccessDTO access;
-
         try {
+            List<AccessDTO> accessList = new ArrayList<>();
+            AccessDTO access;
             for (DocumentSnapshot doc : getCollection().get().get().getDocuments()) {
                 access = doc.toObject(AccessDTO.class);
                 access.setId(doc.getId());
@@ -115,7 +113,7 @@ public class AccessServiceImpl implements AccessService {
                 access.setUsername((String) doc.getData().get("username"));
                 access.setPassword((String) doc.getData().get("password"));
                 access.setLevel((Long) doc.getData().get("level"));
-                access.setRoles((ArrayList<RoleDTO>) doc.getData().get("roles"));
+                access.setAuthorities((ArrayList<RoleDTO>) doc.getData().get("authorities"));
                 return access;
             }
         } catch (Exception e) {
