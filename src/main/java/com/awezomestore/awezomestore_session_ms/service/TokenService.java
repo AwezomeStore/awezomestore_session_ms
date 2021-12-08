@@ -8,7 +8,7 @@ public interface TokenService {
     
     List<TokenDTO> getAll();
 
-    Boolean create(TokenDTO token);
+    String create(TokenDTO token);
 
     Boolean update(String id, TokenDTO token);
 

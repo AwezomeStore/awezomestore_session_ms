@@ -5,10 +5,12 @@ import java.util.List;
 import com.awezomestore.awezomestore_session_ms.dto.UserDTO;
 
 public interface UserService {
+
+    UserDTO getById(String id);
     
     List<UserDTO> getAll();
 
-    Boolean create(UserDTO user);
+    String create(UserDTO user);
 
     Boolean update(String id, UserDTO user);
 
