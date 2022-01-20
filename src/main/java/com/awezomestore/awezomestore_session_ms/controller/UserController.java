@@ -6,6 +6,7 @@ import com.awezomestore.awezomestore_session_ms.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ public class UserController {
         return new ResponseEntity<>(service.getById(id), HttpStatus.OK);
     }
 
+    @PreAuthorize("hasRole('SUPPORT')")
     @GetMapping(value = "/getAll")
     public ResponseEntity getAll(){
         return new ResponseEntity<>(service.getAll(), HttpStatus.OK);
