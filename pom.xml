@@ -16,6 +16,8 @@
 	<description>Session microservice for awezome store project</description>
 	<properties>
 		<java.version>11</java.version>
+		<sonar.organization>awezomestore</sonar.organization>
+		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
 	</properties>
 	<dependencies>
 		<dependency>
